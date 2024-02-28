@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   return (
-    <div>Jai Shree Ram</div>
+    <div className="bg-primary h-screen flex justify-center items-center">Jai Shree Ram</div>
   );
 }
 

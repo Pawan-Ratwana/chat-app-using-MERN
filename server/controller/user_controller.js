@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Conversation = require("../models/Conversation")
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Messages = require("../models/Messages");
 
 // Define the register controller function
 module.exports.register = async (req, res) => {
@@ -57,6 +58,7 @@ module.exports.register = async (req, res) => {
     }
 }
 
+// Define the login controller function
 module.exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -122,7 +124,7 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
-
+// Define the conversation controller function
 module.exports.conversation = async (req, res) => {
     try {
         const { senderId, receiverId } = req.body;
@@ -135,7 +137,7 @@ module.exports.conversation = async (req, res) => {
     }
 }
 
-
+// Define the getConversation controller function
 module.exports.getConversation = async (req, res) => {
     try {
         // Extract user ID from request parameters
@@ -162,6 +164,87 @@ module.exports.getConversation = async (req, res) => {
         // Log the error
         console.error("Error getting conversations: ", err);
         // Send a 500 status code with an error message
+        return res.status(500).send("Internal server error");
+    }
+}
+
+// Define the messages controller function
+module.exports.messages = async (req, res) => {
+    try {
+        // Extract data from request body
+        const { conversationId, senderId, message, receiverId = '' } = req.body;
+
+        // Check if senderId and message are provided
+        if (!senderId || !message) return res.status(400).send("Please fill all required fields");
+
+        // If conversationId is not provided and receiverId is provided, create a new conversation
+        if (!conversationId && receiverId) {
+            const newConversation = new Conversation({ members: [senderId, receiverId] });
+            await newConversation.save();
+            const newMessage = new Messages({ conversationId: newConversation._id, senderId, message })
+            await newMessage.save();
+            return res.status(200).send("Message sent successfully")
+        } else if (!conversationId && !receiverId) {
+            // If conversationId and receiverId both are not provided, send a 400 response
+            return res.status(400).send("Please fill all required fields");
+        }
+
+        // Create a new message instance
+        const newMessage = new Messages({ conversationId, senderId, message });
+
+        // Save the new message to the database
+        await newMessage.save();
+
+        // Send a success response to the client
+        res.status(200).send("Message sent successfully");
+    } catch (err) {
+        // Log and handle any errors that occur
+        console.error("Error sending the message: ", err);
+        // Send an error response to the client
+        return res.status(500).send("Internal server error");
+    }
+}
+
+// Define the getMessage controller function
+module.exports.getMessage = async (req, res) => {
+    try {
+        const conversationId = req.params.conversationId;
+
+        // If conversationId is 'new', send an empty array as response
+        if (conversationId === 'new') return res.status(200).json([])
+
+        // Find messages for the conversation
+        const messages = await Messages.find({ conversationId });
+
+        // Get message data along with user details
+        const messageUserData = await Promise.all(messages.map(async (message) => {
+            const user = await User.findById(message.senderId);
+            return { user: { email: user.email, fullName: user.fullName }, message: message.message }
+        }))
+        // Send message data as JSON response
+        res.status(200).json(messageUserData)
+    } catch (err) {
+        // Log and handle any errors
+        console.error("Error getting message: ", err);
+        return res.status(500).send("Internal server error");
+    }
+}
+
+// Define the allUsers controller function
+module.exports.allUsers = async (req, res) => {
+    try {
+        // Find all users
+        const users = await User.find();
+
+        // Get user data
+        const userData = await Promise.all(users.map(async (user) => {
+            return { user: { email: user.email, fullName: user.fullName }, userId: user._id }
+        }))
+        // Send user data as JSON response
+        res.status(200).json(userData);
+    } catch (err) {
+        // Log and handle any errors
+        console.error("Error finding all users: ", err);
         return res.status(500).send("Internal server error");
     }
 }

@@ -1,5 +1,6 @@
 // Import necessary modules
 const User = require("../models/user");
+const Conversation = require("../models/Conversation")
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -55,6 +56,7 @@ module.exports.register = async (req, res) => {
         return res.status(500).send("Internal Server Error");
     }
 }
+
 module.exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -117,5 +119,49 @@ module.exports.login = async (req, res, next) => {
         // Handle any other errors
         console.error("Error login user: ", err);
         return res.status(500).send("Internal Server Error");
+    }
+}
+
+
+module.exports.conversation = async (req, res) => {
+    try {
+        const { senderId, receiverId } = req.body;
+        const newConversation = new Conversation({ members: [senderId, receiverId] });
+        await newConversation.save();
+        res.status(201).send("Conversation created successfully");
+    } catch (err) {
+        console.error("Error in conversation: ", err);
+        return res.status(500).send("Internal server error: ");
+    }
+}
+
+
+module.exports.getConversation = async (req, res) => {
+    try {
+        // Extract user ID from request parameters
+        const userId = req.params.userId;
+
+        // Find conversations involving the user
+        const conversations = await Conversation.find({ members: { $in: [userId] } });
+
+        // Check if conversations were found
+        if (!conversations || conversations.length === 0) {
+            // If no conversations found, send a 404 status code with a message
+            return res.status(404).send("No conversations found for the user");
+        }
+
+        const conversationUserData = await Promise.all(conversations.map(async (conversation) => {
+            const receiverId = conversation.members.find((member) => member !== userId);
+            const user = await User.findById(receiverId);
+            return ({ user: { email: user.email, fullName: user.fullName }, conversationId: conversation._id })
+        }))
+
+        // Send conversations as JSON response with a 200 status code
+        res.status(200).json(conversationUserData);
+    } catch (err) {
+        // Log the error
+        console.error("Error getting conversations: ", err);
+        // Send a 500 status code with an error message
+        return res.status(500).send("Internal server error");
     }
 }

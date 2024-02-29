@@ -6,11 +6,13 @@ import Form from './modules/Form';
 
 const ProtectedRoute = ({ children }) => {
   const isLoggedIn = localStorage.getItem('user:token') !== null;
+  const isSignInOrSignUpPage = window.location.pathname.includes('/users/sign-in') || window.location.pathname.includes('/users/sign-up');
 
-  if (!isLoggedIn) {
+
+  if (!isLoggedIn && !isSignInOrSignUpPage) {
     return <Navigate to={'/users/sign-in'} />
-  } else if (isLoggedIn && ['/users/sign-in', '/users/sign-up'].includes(window.location.pathname)) {
-    return <Navigate to={'/'} />
+  } else if (isLoggedIn && isSignInOrSignUpPage) {
+    return <Navigate to={'/'} />;
   }
   return children;
 }

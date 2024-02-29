@@ -8,9 +8,11 @@ const User = require('./models/user')
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get('/', (req, res) => {
-    res.send("Welcome to Preetal Chat Application")
-});
+app.use('/', require('./routes'));
+
+app.get('/api', (req, res) => {
+    res.send("Api")
+})
 
 app.listen(port, (err) => {
     if (err) {

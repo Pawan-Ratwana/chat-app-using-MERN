@@ -112,7 +112,7 @@ const Dashboard = () => {
                     </div>
                 </div>
                 <div className='h-[75%]  w-full  overflow-y-scroll'>
-                    <div className='h-[515px]  px-10 py-14'>
+                    <div className='h-[455px]  px-10 py-14'>
                         <div className=' w-[300px] bg-secondary p-2 rounded-b-xl rounded-tr-xl my-2 p-4'>You need to enable JavaScript to run this app.You need to enable JS to run this app.</div>
                         <div className=' w-[300px] bg-secondary rounded-b-xl rounded-tr-xl my-2 p-4'>You need to enable JS to run this app.You need to enable JS to run this app.</div>
                         <div className=' w-[300px] bg-primary rounded-b-xl rounded-tl-xl ml-auto mt-1 p-4 text-white'>You need to enable JS to run this app.You need to enable JS to run this app.</div>
@@ -126,9 +126,10 @@ const Dashboard = () => {
 
 
                     </div>
-                    <div className="h-[68px] fixed w-[48%]  flex items-center justify-center">
-                        <input type="text" placeholder="Message..." className='p-5 pl-6 mt-2 bg-primary shadow-md rounded-full w-[100%] h-[48px] mb-1 focus:ring-0 focus:border-0 outline-none' />
-                        <div className='ml-[-4rem] flex items-center cursor-pointer'>SEND</div>
+                    <div className="h-[68px] fixed w-[48%]  flex items-center bg-transparent justify-center">
+
+                        <input type='text' placeholder="Message..." className='bg-primary text-white p-3 pl-6 rounded-full shadow-md w-full outline-none focus:ring-0 focus:border-0 ' />
+                        <div className='ml-[-4rem] flex items-center text-white cursor-pointer'>SEND</div>
                     </div>
                 </div>
             </div>

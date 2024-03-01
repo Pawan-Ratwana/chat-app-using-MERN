@@ -107,12 +107,13 @@ module.exports.login = async (req, res, next) => {
                         user.token = token;
                         user.save();
 
+
                         // Call next middleware
-                        next();
+                        // Send user object in response
+                        return res.status(200).json({ user: { id: user._id, email: user.email, fullName: user.fullName }, token: user.token });
+                        // next();
                     })
 
-                    // Send user object in response
-                    res.status(200).json({ user });
                 }
             }
 
@@ -128,6 +129,7 @@ module.exports.login = async (req, res, next) => {
 module.exports.conversation = async (req, res) => {
     try {
         const { senderId, receiverId } = req.body;
+        console.log("Sender : ", senderId, " , Receiver: ", receiverId)
         const newConversation = new Conversation({ members: [senderId, receiverId] });
         await newConversation.save();
         res.status(201).send("Conversation created successfully");

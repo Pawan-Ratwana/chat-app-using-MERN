@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import profileImg from '../../assets/title_logo.png'
+import { json } from 'react-router-dom';
 
 const Dashboard = () => {
 
@@ -25,13 +27,33 @@ const Dashboard = () => {
         }
     ]
 
+    useEffect(() => {
+        const loggedInUser = JSON.parse(localStorage.getItem('user:detail'));
+        const fetchConversations = async () => {
+            const res = await fetch(`http://localhost:8000/api/users/conversation/${loggedInUser.id}`, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const resData = await res.json();
+            console.log("resData => ", resData);
+            setConversations(resData);
+        }
+        fetchConversations()
+    }, [])
+
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user:detail')));
+    const [conversations, setConversations] = useState([]);
+    console.log('User => ', user)
+
     return (<div className="w-screen flex">
         <div className="w-[25%]  h-screen bg-secondary border-r border-r-gray-500 border-1">
             <div className='flex mx-6 items-center my-6 '>
                 <div className='border border-primary p-[2px] rounded-full cursor-pointer'> <img src={profileImg} alt='User Profile' width={50} height={50} className='rounded-full ' />
                 </div>
                 <div className='ml-6'>
-                    <h3 className='text-2xl cursor-pointer'>Preetal</h3>
+                    <h3 className='text-2xl cursor-pointer'>{user?.fullName}</h3>
                     <p className='text-lg font-light'>My Account</p>
                 </div>
             </div>
@@ -40,26 +62,27 @@ const Dashboard = () => {
                 <div className='text-primary text-lg ml-4 mt-3'>Messages</div>
                 <div>
                     {
-                        contacts.map(({ name, status, img }) => {
-                            return (
-                                <div className='flex  items-center my-2 ml-2 py-2 border-b border-b-gray-300'>
-                                    <div className='flex items-center cursor-pointer'>
-                                        <div className=' p-[2px] rounded-full '> <img src={img} alt='User Profile' width={40} height={40} className='rounded-full ' />
-                                        </div>
-                                        <div>
-                                            <h3 className='ml-4 font-[500] text-lg'>{name}</h3>
-                                            <p className='ml-4 font-[450] text-sm text-gray-6000'>{status}</p>
-                                        </div>
+                        conversations.length > 0 ?
+                            conversations.map(({ conversationId, user }) => {
+                                return (
+                                    <div className='flex  items-center my-2 ml-2 py-2 border-b border-b-gray-300'>
+                                        <div className='flex items-center cursor-pointer'>
+                                            <div className=' p-[2px] rounded-full '> <img src={profileImg} alt='User Profile' width={40} height={40} className='rounded-full ' />
+                                            </div>
+                                            <div>
+                                                <h3 className='ml-4 font-[500] text-lg'>{user?.fullName}</h3>
+                                                <p className='ml-4 font-[450] text-sm text-gray-6000'>{user?.email}</p>
+                                            </div>
 
+
+
+                                        </div>
 
 
                                     </div>
 
-
-                                </div>
-
-                            )
-                        })
+                                )
+                            }) : <div className='text-center text-lg font-semibold mt-24'>No Conversation</div>
                     }
                 </div>
             </div>

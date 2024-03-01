@@ -16,15 +16,38 @@ const Form = ({
     })
 
     const navigate = useNavigate();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("data => ", data);
+        const res = await fetch(`http://localhost:8000/api/users/${isSignInPage ? 'login' : 'register'}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
 
-    // console.log("data => ", data)
+        if (res.status === 400) {
+            alert("Invalid Credentials");
+        } else {
+            const resData = await res.json();
+            if (resData.token) {
+                localStorage.setItem('user:token', resData.token)
+                localStorage.setItem('user:detail', JSON.stringify(resData.user))
+                console.log("ResData =>  ", localStorage.setItem('user:detail', JSON.stringify(resData.user)));
+                navigate('/')
+            }
+        }
+
+
+    }
 
     return (<div className="bg-[#9be1e6] h-screen flex justify-center items-center">
         <div className="bg-white w-[600px] h-full border border-blue-500 flex flex-col items-center justify-center shadow-lg rounded-lg">
             <div className="text-4xl font-bold mb-4">Welcome to Preetal</div>
             <div className="text-xl font-light mb-9">{isSignInPage ? 'Sign In to get explored' : 'Sign Up now to get started'}</div>
 
-            <form className="w-full flex flex-col  justify-center items-center" onSubmit={() => console.log("Submitted")}>
+            <form className="w-full flex flex-col  justify-center items-center" onSubmit={(e) => handleSubmit(e)}>
 
                 {/* input for Full name  */}
                 {!isSignInPage && <Input label="Full Name" name="name" placeholder="Enter your Full Name" className="mb-6" value={data.fullName} onChange={(e) => setData({ ...data, fullName: e.target.value })} />}

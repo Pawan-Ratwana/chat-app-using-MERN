@@ -149,15 +149,15 @@ module.exports.getConversation = async (req, res) => {
         const conversations = await Conversation.find({ members: { $in: [userId] } });
 
         // Check if conversations were found
-        if (!conversations || conversations.length === 0) {
-            // If no conversations found, send a 404 status code with a message
-            return res.status(404).send("No conversations found for the user");
-        }
+        // if (!conversations || conversations.length === 0) {
+        //     // If no conversations found, send a 404 status code with a message
+        //     return res.status(404).send("No conversations found for the user");
+        // }
 
         const conversationUserData = await Promise.all(conversations.map(async (conversation) => {
             const receiverId = conversation.members.find((member) => member !== userId);
             const user = await User.findById(receiverId);
-            return ({ user: { email: user.email, fullName: user.fullName }, conversationId: conversation._id })
+            return ({ user: { receiverId: user._id, email: user.email, fullName: user.fullName }, conversationId: conversation._id })
         }))
 
         // Send conversations as JSON response with a 200 status code
@@ -175,12 +175,11 @@ module.exports.messages = async (req, res) => {
     try {
         // Extract data from request body
         const { conversationId, senderId, message, receiverId = '' } = req.body;
-
         // Check if senderId and message are provided
         if (!senderId || !message) return res.status(400).send("Please fill all required fields");
 
         // If conversationId is not provided and receiverId is provided, create a new conversation
-        if (!conversationId && receiverId) {
+        if (conversationId === 'new' && receiverId) {
             const newConversation = new Conversation({ members: [senderId, receiverId] });
             await newConversation.save();
             const newMessage = new Messages({ conversationId: newConversation._id, senderId, message })
@@ -210,21 +209,31 @@ module.exports.messages = async (req, res) => {
 // Define the getMessage controller function
 module.exports.getMessage = async (req, res) => {
     try {
+        const checkMessages = async (conversationId) => {
+            const messages = await Messages.find({ conversationId });
+            const messageUserData = await Promise.all(messages.map(async (message) => {
+                const user = await User.findById(message.senderId);
+                return { user: { id: user._id, email: user.email, fullName: user.fullName }, message: message.message }
+            }));
+            return messageUserData;
+        }
+
         const conversationId = req.params.conversationId;
 
         // If conversationId is 'new', send an empty array as response
-        if (conversationId === 'new') return res.status(200).json([])
-
-        // Find messages for the conversation
-        const messages = await Messages.find({ conversationId });
-
-        // Get message data along with user details
-        const messageUserData = await Promise.all(messages.map(async (message) => {
-            const user = await User.findById(message.senderId);
-            return { user: { email: user.email, fullName: user.fullName }, message: message.message }
-        }))
-        // Send message data as JSON response
-        res.status(200).json(messageUserData)
+        if (conversationId === 'new') {
+            const checkConversation = await Conversation.find({ members: { $all: [req.query.senderId, req.query.receiverId] } });
+            if (checkConversation.length > 0) {
+                const messageUserData = await checkMessages(checkConversation[0]._id);
+                return res.status(200).json(messageUserData);
+            } else {
+                console.log("Heyy whatsapp")
+                return res.status(200).json([]);
+            }
+        } else {
+            const messageUserData = await checkMessages(conversationId);
+            return res.status(200).json(messageUserData);
+        }
     } catch (err) {
         // Log and handle any errors
         console.error("Error getting message: ", err);
@@ -232,15 +241,18 @@ module.exports.getMessage = async (req, res) => {
     }
 }
 
+
 // Define the allUsers controller function
 module.exports.allUsers = async (req, res) => {
     try {
-        // Find all users
-        const users = await User.find();
+        const userId = req.params.userId;
+
+        // const users = await User.find();
+        const users = await User.find({ _id: { $ne: userId } });
 
         // Get user data
         const userData = await Promise.all(users.map(async (user) => {
-            return { user: { email: user.email, fullName: user.fullName }, userId: user._id }
+            return { user: { email: user.email, fullName: user.fullName, receiverId: user._id } }
         }))
         // Send user data as JSON response
         res.status(200).json(userData);

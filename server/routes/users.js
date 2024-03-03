@@ -8,6 +8,6 @@ router.post('/conversation', userController.conversation);
 router.get('/conversation/:userId', userController.getConversation);
 router.post('/message', userController.messages);
 router.get('/message/:conversationId', userController.getMessage);
-router.get('/allUsers', userController.allUsers);
+router.get('/allUsers/:userId', userController.allUsers);
 
 module.exports = router;

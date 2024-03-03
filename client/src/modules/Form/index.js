@@ -18,7 +18,7 @@ const Form = ({
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("data => ", data);
+        // console.log("data => ", data);
         const res = await fetch(`http://localhost:8000/api/users/${isSignInPage ? 'login' : 'register'}`, {
             method: 'POST',
             headers: {
@@ -34,7 +34,7 @@ const Form = ({
             if (resData.token) {
                 localStorage.setItem('user:token', resData.token)
                 localStorage.setItem('user:detail', JSON.stringify(resData.user))
-                console.log("ResData =>  ", localStorage.setItem('user:detail', JSON.stringify(resData.user)));
+                // console.log("ResData =>  ", localStorage.setItem('user:detail', JSON.stringify(resData.user)));
                 navigate('/')
             }
         }

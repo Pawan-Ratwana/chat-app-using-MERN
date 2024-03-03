@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import profileImg from '../../assets/title_logo.png'
 import { json } from 'react-router-dom';
+import { io } from 'socket.io-client'
 
 const Dashboard = () => {
 
@@ -9,11 +10,32 @@ const Dashboard = () => {
     const [conversations, setConversations] = useState([]);
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState([]);
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState([]);
+    const [socket, setSocket] = useState(null);
     // console.log('User => ', user);
     // console.log("Conversations => ", conversations)
-    // console.log("messages => ", messages)
+    console.log("messages => ", messages)
     // console.log("users => ", users)
+
+    useEffect(() => {
+        setSocket(io('http://localhost:8080'));
+        // console.log("connect");
+    }, []);
+
+    useEffect(() => {
+        socket?.emit('addUser', user?.id);
+        socket?.on('getUsers', users => {
+            console.log('ActiveUsers => ', users)
+        });
+
+        socket?.on('getMessage', data => {
+            console.log("data => ", data);
+            setMessages(prev => ({
+                ...prev,
+                messages: [...prev.messages, { user: data.user, message: data.message }]
+            }))
+        })
+    }, [socket])
 
     useEffect(() => {
         const loggedInUser = JSON.parse(localStorage.getItem('user:detail'));
@@ -85,10 +107,12 @@ const Dashboard = () => {
 
 
     const sendMessage = async () => {
-        console.log("output for send messages ", "conversationId:", messages?.conversationId,
-            "senderId:", user?.id,
-            "message", message,
-            "receiverId:", messages?.receiver?.receiverId)
+        socket?.emit('sendMessage', {
+            senderId: user?.id,
+            receiverId: messages?.receiver?.receiverId,
+            message,
+            conversationId: messages?.conversationId
+        })
         const res = await fetch(`http://localhost:8000/api/users/message`, {
             method: "POST",
             headers: {

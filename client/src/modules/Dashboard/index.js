@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import profileImg from '../../assets/title_logo.png'
 import { json } from 'react-router-dom';
 import { io } from 'socket.io-client'
+import './style.css';
 
 const Dashboard = () => {
 
@@ -12,6 +13,7 @@ const Dashboard = () => {
     const [message, setMessage] = useState([]);
     const [users, setUsers] = useState([]);
     const [socket, setSocket] = useState(null);
+    const [showMessage, setShowMessage] = useState([]);
     const messageRef = useRef(null);
     // console.log('User => ', user);
     // console.log("Conversations => ", conversations)
@@ -133,9 +135,14 @@ const Dashboard = () => {
         setMessage('');
     }
 
+    const handleCallButton = () => {
+        setShowMessage(true);
+    }
+    const handleCloseMessage = () => {
+        setShowMessage(false);
+    }
 
-
-    return (<div className="w-screen h-[92vh] flex">
+    return (<div className="w-screen  h-[92vh] flex">
         <div className="w-[25%]   bg-secondary border-r border-r-gray-500 border-1">
             <div className='flex mx-6 items-center my-6 '>
                 <div className='border border-primary p-[2px] rounded-full cursor-pointer'> <img src={profileImg} alt='User Profile' width={50} height={50} className='rounded-full ' />
@@ -178,25 +185,35 @@ const Dashboard = () => {
                 {
                     messages?.receiver?.fullName &&
 
-                    <div className='w-full  h-[55px] bg-secondary flex mt-1 p-6 items-center border-b border-b-gray-500 border-1'>
+                    <div className='w-full  h-[55px] bg-secondary flex  p-8 items-center border-b border-b-gray-500 border-1'>
                         <div className='cursor-pointer'><img src={profileImg} alt='Profile-pic' width={40} height={40} className='rounded-full' /></div>
                         <div className='ml-4 mr-auto'>
                             <h3 className='text-lg cursor-pointer'>{messages?.receiver?.fullName}</h3>
                             <p className='text-sm font-light text-gray-600'>{messages?.receiver?.email}</p>
                         </div>
-                        <div className='mr-2 cursor-pointer'>
+                        <div className='mr-2 cursor-pointer ' onClick={handleCallButton}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-phone" width="35" height="35" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#2c3e50" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
                             </svg>
                         </div>
-                        <div className='cursor-pointer'>
+                        <div className='cursor-pointer ' onClick={handleCallButton}>
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-video" width="35" height="35" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z" />
                                 <path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
                             </svg>
                         </div>
+                        {
+                            showMessage && (
+                                <div className='lightbox'>
+                                    <div className='lightbox-content'>
+                                        <span className='close' onClick={handleCloseMessage}><i className="fa fa-close"></i></span>
+                                        <p className='mt-3 text-lg'> Coming Soon!</p>
+                                    </div>
+                                </div>
+                            )
+                        }
                     </div>
                     // : console.log("not found")
                 }

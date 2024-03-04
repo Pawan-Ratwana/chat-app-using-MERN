@@ -1,0 +1,32 @@
+.lightbox {
+  display: block;
+  position: fixed;
+  z-index: 999;
+  width: 10%;
+  height: 10%;
+  top: 113px;
+  right: 380px;
+  background-color: rgb(8, 106, 219);
+  box-shadow: 10px 0 10px rgba(8, 200, 119, 0.3);
+}
+
+.lightbox-content {
+  position: absolute;
+  top: 12px;
+  left: 15px;
+  transform: translate(-5px, -15px);
+  /* background-color: white; */
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  color: white;
+}
+.close {
+  position: absolute;
+  top: -2px;
+  right: -7px;
+  padding: 2px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}

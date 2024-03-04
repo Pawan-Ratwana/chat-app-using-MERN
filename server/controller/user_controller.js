@@ -241,7 +241,6 @@ module.exports.getMessage = async (req, res) => {
     }
 }
 
-
 // Define the allUsers controller function
 module.exports.allUsers = async (req, res) => {
     try {
@@ -260,5 +259,29 @@ module.exports.allUsers = async (req, res) => {
         // Log and handle any errors
         console.error("Error finding all users: ", err);
         return res.status(500).send("Internal server error");
+    }
+}
+
+
+
+module.exports.signOut = async (req, res) => {
+    try {
+        // Get the user ID from the request object
+        const userId = req.body.id;
+        console.log(userId)
+
+        // Clear the user's token from the database
+        await User.findByIdAndUpdate(userId, { token: null });
+
+        // Check if the token is removed
+        const user = await User.findById(userId);
+        console.log("User after sign out:", user.token);
+
+        // Send a success response
+        return res.status(200).send("User signed out successfully");
+    } catch (err) {
+        // Handle any errors
+        console.error("Error signing out user: ", err);
+        return res.status(500).send("Internal Server Error");
     }
 }

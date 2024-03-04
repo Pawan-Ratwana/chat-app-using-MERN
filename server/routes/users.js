@@ -9,5 +9,6 @@ router.get('/conversation/:userId', userController.getConversation);
 router.post('/message', userController.messages);
 router.get('/message/:conversationId', userController.getMessage);
 router.get('/allUsers/:userId', userController.allUsers);
+router.post('/signOut', userController.signOut);
 
 module.exports = router;

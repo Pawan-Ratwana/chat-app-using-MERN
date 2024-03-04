@@ -15,7 +15,7 @@ const Dashboard = () => {
     const messageRef = useRef(null);
     // console.log('User => ', user);
     // console.log("Conversations => ", conversations)
-    console.log("messages => ", messages)
+    // console.log("messages => ", messages)
     // console.log("users => ", users)
 
     useEffect(() => {
@@ -26,7 +26,7 @@ const Dashboard = () => {
     useEffect(() => {
         socket?.emit('addUser', user?.id);
         socket?.on('getUsers', users => {
-            console.log('ActiveUsers => ', users)
+            // console.log('ActiveUsers => ', users)
         });
 
         socket?.on('getMessage', data => {
@@ -75,7 +75,7 @@ const Dashboard = () => {
         if (conversationId === 'new') {
             // Check if there's an existing conversation with the receiver
             const existingConversation = conversations.find(conv => {
-                console.log(conv)
+                // console.log(conv)
                 return conv.user.receiverId === receiver.receiverId;
             });
 
@@ -135,8 +135,8 @@ const Dashboard = () => {
 
 
 
-    return (<div className="w-screen flex">
-        <div className="w-[25%]  h-screen bg-secondary border-r border-r-gray-500 border-1">
+    return (<div className="w-screen h-[92vh] flex">
+        <div className="w-[25%]   bg-secondary border-r border-r-gray-500 border-1">
             <div className='flex mx-6 items-center my-6 '>
                 <div className='border border-primary p-[2px] rounded-full cursor-pointer'> <img src={profileImg} alt='User Profile' width={50} height={50} className='rounded-full ' />
                 </div>
@@ -173,7 +173,7 @@ const Dashboard = () => {
             </div>
         </div>
 
-        <div className="w-[50%]  bg-white h-screen  border-r border-r-gray-500 border-1">
+        <div className="w-[50%]  bg-white  border-r border-r-gray-500 border-1">
             <div>
                 {
                     messages?.receiver?.fullName &&
@@ -201,7 +201,7 @@ const Dashboard = () => {
                     // : console.log("not found")
                 }
                 <div className='h-[75%]  w-full  overflow-y-scroll'>
-                    <div className='h-[455px]  px-10 py-14'>
+                    <div className='h-[530px]  px-10 py-14'>
 
                         {
 
@@ -238,7 +238,7 @@ const Dashboard = () => {
             </div>
         </div>
 
-        <div className="w-[25%] bg-secondary h-screen ">
+        <div className="w-[25%] bg-secondary  ">
             <div>
 
                 <div className='w-full  h-[55px] bg-secondary flex mt-1  p-6 items-center border-b border-b-gray-500 border-1'>

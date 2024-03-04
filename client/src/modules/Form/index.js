@@ -31,18 +31,19 @@ const Form = ({
             alert("Invalid Credentials");
         } else {
             const resData = await res.json();
+            // console.log("resData", resData)
             if (resData.token) {
                 localStorage.setItem('user:token', resData.token)
                 localStorage.setItem('user:detail', JSON.stringify(resData.user))
                 // console.log("ResData =>  ", localStorage.setItem('user:detail', JSON.stringify(resData.user)));
                 navigate('/')
+                window.location.reload();
             }
         }
 
 
     }
-
-    return (<div className="bg-[#9be1e6] h-screen flex justify-center items-center">
+    return (<div className="bg-[#9be1e6] h-[92vh] flex justify-center items-center">
         <div className="bg-white w-[600px] h-full border border-blue-500 flex flex-col items-center justify-center shadow-lg rounded-lg">
             <div className="text-4xl font-bold mb-4">Welcome to Preetal</div>
             <div className="text-xl font-light mb-9">{isSignInPage ? 'Sign In to get explored' : 'Sign Up now to get started'}</div>

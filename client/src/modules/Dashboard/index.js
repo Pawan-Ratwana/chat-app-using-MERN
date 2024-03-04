@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import profileImg from '../../assets/title_logo.png'
 import { json } from 'react-router-dom';
 import { io } from 'socket.io-client'
@@ -12,6 +12,7 @@ const Dashboard = () => {
     const [message, setMessage] = useState([]);
     const [users, setUsers] = useState([]);
     const [socket, setSocket] = useState(null);
+    const messageRef = useRef(null);
     // console.log('User => ', user);
     // console.log("Conversations => ", conversations)
     console.log("messages => ", messages)
@@ -35,7 +36,11 @@ const Dashboard = () => {
                 messages: [...prev.messages, { user: data.user, message: data.message }]
             }))
         })
-    }, [socket])
+    }, [socket]);
+
+    useEffect(() => {
+        messageRef?.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [messages?.messages]);
 
     useEffect(() => {
         const loggedInUser = JSON.parse(localStorage.getItem('user:detail'));
@@ -128,6 +133,8 @@ const Dashboard = () => {
         setMessage('');
     }
 
+
+
     return (<div className="w-screen flex">
         <div className="w-[25%]  h-screen bg-secondary border-r border-r-gray-500 border-1">
             <div className='flex mx-6 items-center my-6 '>
@@ -139,14 +146,14 @@ const Dashboard = () => {
                 </div>
             </div>
             <hr />
-            <div>
+            <div className='overflow-y-scroll'>
                 <div className='text-primary text-lg ml-4 mt-3'>Messages</div>
                 <div>
                     {
                         conversations.length > 0 ?
                             conversations.map(({ conversationId, user }) => {
                                 return (
-                                    <div className='flex  items-center my-2 ml-2 py-2 border-b border-b-gray-300'>
+                                    <div className='flex  items-center my-2 ml-2 py-2 border-b border-b-gray-300 '>
                                         <div className='flex items-center w-full cursor-pointer' onClick={() => {
                                             fetchMessages(conversationId, user);
                                         }}>
@@ -203,7 +210,10 @@ const Dashboard = () => {
                                 messages?.messages?.map(({ message, user: { id } = {} }) => {
 
                                     return (
-                                        <div key={message._id} className={`max-w-[40%] rounded-b-xl p-4 mb-6 ${id === user?.id ? 'bg-primary text-white rounded-tl-xl ml-auto' : 'bg-secondary rounded-tr-xl'}`}>{message}</div>
+                                        <>
+                                            <div key={message._id} className={`max-w-[40%] rounded-b-xl p-4 mb-6 ${id === user?.id ? 'bg-primary text-white rounded-tl-xl ml-auto' : 'bg-secondary rounded-tr-xl'}`}>{message}</div>
+                                            <div ref={messageRef}></div>
+                                        </>
                                     );
                                 })
                             ) : (
@@ -234,7 +244,7 @@ const Dashboard = () => {
                 <div className='w-full  h-[55px] bg-secondary flex mt-1  p-6 items-center border-b border-b-gray-500 border-1'>
                     <h2 className='text-2xl flex items-center text-Gray-600'>Details</h2>
                 </div >
-                <div className=' '>
+                <div className='overflow-y-scroll  '>
                     <h3 className='text-xl mb-4 m-6'>People</h3>
                     <div >
                         {
